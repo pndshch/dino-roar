@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>きょうりゅうほえ | Pinda Lab</title>
+<meta name="description" content="ボタンをおすと きょうりゅうが ほえる!8種類のきょうりゅうの鳴き声を聞き比べよう。">
+<meta property="og:title" content="きょうりゅうほえ">
+<meta property="og:description" content="きょうりゅうがほえる!子供向け恐竜サウンドボックス">
+<meta property="og:url" content="https://pndshch.github.io/dino-roar/">
+<meta name="twitter:card" content="summary">
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+body {
+    background: radial-gradient(ellipse at top, #0a2a1a 0%, #0d1117 70%);
+    color: #e6edf3;
+    font-family: 'Hiragino Maru Gothic ProN', system-ui, sans-serif;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 24px 16px 32px;
+    user-select: none;
+}
+.topbar {
+    width: 100%; max-width: 480px;
+    display: flex; justify-content: space-between;
+    color: #6d7680; font-size: 12px; margin-bottom: 12px;
+}
+.topbar a { color: #6d7680; text-decoration: none; }
+.brand-title {
+    font-size: 30px; font-weight: 800; text-align: center;
+    background: linear-gradient(135deg, #34d399, #facc15);
+    -webkit-background-clip: text; background-clip: text; color: transparent;
+}
+.brand-sub { color: #8b949e; font-size: 13px; text-align: center; margin-top: 4px; margin-bottom: 16px; }
+
+.now-playing {
+    width: 100%;
+    max-width: 480px;
+    background: #161b22;
+    border: 1px solid #30363d;
+    border-radius: 14px;
+    padding: 16px 18px;
+    margin-bottom: 14px;
+    text-align: center;
+    min-height: 100px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+.np-emoji { font-size: 48px; margin-bottom: 4px; line-height: 1; }
+.np-name { font-size: 18px; font-weight: 800; color: #34d399; }
+.np-fact { font-size: 12px; color: #8b949e; margin-top: 4px; line-height: 1.5; }
+.np-empty { color: #6d7680; font-size: 13px; }
+
+.dino-grid {
+    width: 100%;
+    max-width: 480px;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+}
+.dino-btn {
+    aspect-ratio: 4 / 3;
+    background: #161b22;
+    border: 2px solid #30363d;
+    border-radius: 14px;
+    cursor: pointer;
+    font-family: inherit;
+    color: #fff;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    transition: transform 0.1s, border-color 0.15s;
+    position: relative;
+    overflow: hidden;
+}
+.dino-btn:active { transform: scale(0.96); border-color: #34d399; }
+.dino-btn .em { font-size: 56px; line-height: 1; }
+.dino-btn .name { font-size: 13px; font-weight: 700; }
+.dino-btn.playing {
+    border-color: #34d399;
+    box-shadow: 0 0 20px rgba(52,211,153,0.4);
+    animation: pulse 0.6s infinite alternate;
+}
+@keyframes pulse {
+    from { box-shadow: 0 0 20px rgba(52,211,153,0.4); }
+    to { box-shadow: 0 0 30px rgba(52,211,153,0.7); }
+}
+
+.actions {
+    display: flex;
+    gap: 8px;
+    margin-top: 14px;
+    width: 100%;
+    max-width: 480px;
+}
+.btn {
+    flex: 1;
+    padding: 12px;
+    border: none;
+    border-radius: 10px;
+    font-size: 13px;
+    font-weight: 700;
+    font-family: inherit;
+    cursor: pointer;
+    color: #fff;
+}
+.btn-shuffle { background: linear-gradient(135deg, #34d399, #10b981); }
+.btn-share { background: #1d9bf0; }
+.btn:active { transform: scale(0.97); }
+
+.footer {
+    margin-top: 18px;
+    color: #6d7680;
+    font-size: 11px;
+    text-align: center;
+}
+.footer a { color: #6d7680; text-decoration: none; }
+</style>
+</head>
+<body>
+<div class="topbar">
+    <a href="https://pndshch.github.io/">← Pinda Lab</a>
+    <span>きょうりゅうほえ</span>
+</div>
+
+<div class="brand-title">きょうりゅうほえ</div>
+<div class="brand-sub">タップして きょうりゅうの こえを ききくらべよう!</div>
+
+<div class="now-playing" id="np">
+    <div class="np-empty">ボタンを タップ してね</div>
+</div>
+
+<div class="dino-grid" id="grid"></div>
+
+<div class="actions">
+    <button class="btn btn-shuffle" id="shuffle">🎲 ランダム</button>
+    <button class="btn btn-share" id="share">𝕏 にシェア</button>
+</div>
+
+<div class="footer">
+    <p><a href="https://pndshch.github.io/">© Pinda Lab</a> · <a href="https://www.buymeacoffee.com/pndshch" target="_blank">☕</a></p>
+</div>
+
+<script>
+'use strict';
+// Each dinosaur has a unique sound profile
+const DINOS = [
+    { id:'trex', em:'🦖', name:'ティラノサウルス', fact:'地球史上 さいきょう級の 肉食きょうりゅう!', f0:80,  f1:140, dur:1.6, type:'sawtooth', vibrato:8,  mod:1.0 },
+    { id:'bron', em:'🦕', name:'ブラキオサウルス',  fact:'長い首と 大きな体の そうしょくきょうりゅう。', f0:60,  f1:100, dur:2.0, type:'triangle',  vibrato:3,  mod:0.7 },
+    { id:'velo', em:'🐊', name:'ヴェロキラプトル',  fact:'すばやくて かしこい 小がた肉食きょうりゅう。', f0:300, f1:500, dur:0.8, type:'square',   vibrato:14, mod:1.4 },
+    { id:'tric', em:'🦏', name:'トリケラトプス',    fact:'3本の つのを もつ ちからもち。',           f0:120, f1:180, dur:1.4, type:'sawtooth', vibrato:5,  mod:0.9 },
+    { id:'pter', em:'🦅', name:'プテラノドン',      fact:'大きな つばさで 空をとぶ。',                f0:600, f1:1100,dur:0.9, type:'sine',     vibrato:12, mod:1.6 },
+    { id:'steg', em:'🐢', name:'ステゴサウルス',    fact:'背中の せばんが かっこいい。',              f0:90,  f1:140, dur:1.5, type:'triangle', vibrato:4,  mod:0.8 },
+    { id:'duck', em:'🦆', name:'パラサウロロフス',  fact:'頭の とさかから 音を出すよ!',             f0:220, f1:340, dur:1.7, type:'sine',     vibrato:7,  mod:1.0 },
+    { id:'baby', em:'🐣', name:'あかちゃんダイノ',  fact:'うまれたばかり!かわいい。',                  f0:500, f1:900, dur:0.6, type:'sine',     vibrato:18, mod:1.8 },
+];
+
+const grid = document.getElementById('grid');
+DINOS.forEach(d => {
+    const b = document.createElement('button');
+    b.className = 'dino-btn';
+    b.dataset.id = d.id;
+    b.innerHTML = `<span class="em">${d.em}</span><span class="name">${d.name}</span>`;
+    b.addEventListener('click', () => roar(d, b));
+    grid.appendChild(b);
+});
+
+let actx = null;
+let activeBtn = null;
+let activeNodes = [];
+function getCtx() {
+    if (!actx) actx = new (window.AudioContext || window.webkitAudioContext)();
+    if (actx.state === 'suspended') actx.resume();
+    return actx;
+}
+
+function stopAll() {
+    activeNodes.forEach(n => { try { n.stop(); n.disconnect(); } catch {} });
+    activeNodes = [];
+    if (activeBtn) activeBtn.classList.remove('playing');
+    activeBtn = null;
+}
+
+function roar(d, btn) {
+    stopAll();
+    const ctx = getCtx();
+    const t0 = ctx.currentTime;
+    const dur = d.dur;
+
+    // base oscillator with frequency sweep
+    const osc = ctx.createOscillator();
+    osc.type = d.type;
+    osc.frequency.setValueAtTime(d.f0, t0);
+    osc.frequency.exponentialRampToValueAtTime(d.f1, t0 + dur * 0.3);
+    osc.frequency.exponentialRampToValueAtTime(d.f0 * 0.7, t0 + dur);
+
+    // vibrato via LFO
+    const lfo = ctx.createOscillator();
+    lfo.frequency.value = d.vibrato;
+    const lfoGain = ctx.createGain();
+    lfoGain.gain.value = d.f0 * 0.15;
+    lfo.connect(lfoGain).connect(osc.frequency);
+
+    // subharmonic for grit
+    const sub = ctx.createOscillator();
+    sub.type = 'sawtooth';
+    sub.frequency.setValueAtTime(d.f0 * 0.5, t0);
+    sub.frequency.exponentialRampToValueAtTime(d.f1 * 0.5, t0 + dur * 0.3);
+    sub.frequency.exponentialRampToValueAtTime(d.f0 * 0.35, t0 + dur);
+    const subGain = ctx.createGain();
+    subGain.gain.value = 0.25 * d.mod;
+
+    // amplitude envelope
+    const gain = ctx.createGain();
+    gain.gain.setValueAtTime(0, t0);
+    gain.gain.linearRampToValueAtTime(0.4, t0 + 0.05);
+    gain.gain.linearRampToValueAtTime(0.4, t0 + dur * 0.7);
+    gain.gain.exponentialRampToValueAtTime(0.0001, t0 + dur);
+
+    // filter for tone
+    const filter = ctx.createBiquadFilter();
+    filter.type = 'lowpass';
+    filter.frequency.value = 2000 * d.mod;
+    filter.Q.value = 4;
+
+    // distortion via waveshaper
+    const dist = ctx.createWaveShaper();
+    const curve = new Float32Array(256);
+    for (let i = 0; i < 256; i++) {
+        const x = (i / 128) - 1;
+        curve[i] = Math.tanh(x * 3);
+    }
+    dist.curve = curve;
+
+    osc.connect(dist);
+    sub.connect(subGain).connect(dist);
+    dist.connect(filter).connect(gain).connect(ctx.destination);
+
+    osc.start(t0); osc.stop(t0 + dur);
+    sub.start(t0); sub.stop(t0 + dur);
+    lfo.start(t0); lfo.stop(t0 + dur);
+
+    activeNodes.push(osc, sub, lfo);
+    btn.classList.add('playing');
+    activeBtn = btn;
+    setTimeout(() => {
+        if (activeBtn === btn) {
+            btn.classList.remove('playing');
+            activeBtn = null;
+        }
+    }, dur * 1000);
+
+    // update now-playing
+    document.getElementById('np').innerHTML =
+        `<div class="np-emoji">${d.em}</div>` +
+        `<div class="np-name">${d.name}</div>` +
+        `<div class="np-fact">${d.fact}</div>`;
+}
+
+document.getElementById('shuffle').addEventListener('click', () => {
+    const d = DINOS[Math.floor(Math.random() * DINOS.length)];
+    const btn = grid.querySelector(`[data-id="${d.id}"]`);
+    roar(d, btn);
+});
+document.getElementById('share').addEventListener('click', () => {
+    window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent('きょうりゅうほえ 🦖 8種類のきょうりゅうのほえごえを ききくらべ!')}&url=${encodeURIComponent('https://pndshch.github.io/dino-roar/')}`, '_blank', 'noopener');
+});
+</script>
+</body>
+</html>
