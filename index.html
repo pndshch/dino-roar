@@ -3,36 +3,91 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>きょうりゅうほえ | Pinda Lab</title>
-<meta property="og:title" content="Dino Roar Box">
+<title>きょうりゅうずかん | Pinda Lab</title>
+<meta name="description" content="12種類のきょうりゅうの図鑑。時代・大きさ・食べもの・豆知識まで。サイズ比較つき。">
+<meta property="og:title" content="Dino Field Guide">
+<meta property="og:description" content="12 dinosaurs with size comparison, era, diet, and facts">
 <meta property="og:url" content="https://pndshch.github.io/dino-roar/">
+<meta name="twitter:card" content="summary">
 <style>
 * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-body { background: radial-gradient(ellipse at top, #0a2a1a 0%, #0d1117 70%); color: #e6edf3; font-family: 'Hiragino Maru Gothic ProN', system-ui, sans-serif; min-height: 100vh; display: flex; flex-direction: column; align-items: center; padding: 24px 16px 32px; user-select: none; }
+body { background: radial-gradient(ellipse at top, #0a2a1a 0%, #0d1117 70%); color: #e6edf3; font-family: 'Hiragino Maru Gothic ProN', system-ui, sans-serif; min-height: 100vh; padding: 24px 16px 32px; user-select: none; }
+.container { max-width: 720px; margin: 0 auto; }
 .lang-switch { position: fixed; top: 12px; right: 12px; display: flex; gap: 2px; background: rgba(22,27,34,0.9); border: 1px solid #30363d; border-radius: 8px; padding: 3px; z-index: 1000; }
 .lang-btn { background: transparent; border: none; color: #7d8590; font-size: 11px; font-weight: 600; padding: 4px 8px; border-radius: 5px; cursor: pointer; font-family: system-ui, sans-serif; }
 .lang-btn.active { background: #34d399; color: #0d1117; }
-.topbar { width: 100%; max-width: 480px; display: flex; justify-content: space-between; color: #6d7680; font-size: 12px; margin-bottom: 12px; }
+.topbar { display: flex; justify-content: space-between; color: #6d7680; font-size: 12px; margin-bottom: 12px; }
 .topbar a { color: #6d7680; text-decoration: none; }
 .brand-title { font-size: 30px; font-weight: 800; text-align: center; background: linear-gradient(135deg, #34d399, #facc15); -webkit-background-clip: text; background-clip: text; color: transparent; }
 .brand-sub { color: #8b949e; font-size: 13px; text-align: center; margin-top: 4px; margin-bottom: 16px; }
-.now-playing { width: 100%; max-width: 480px; background: #161b22; border: 1px solid #30363d; border-radius: 14px; padding: 16px 18px; margin-bottom: 14px; text-align: center; min-height: 100px; display: flex; flex-direction: column; justify-content: center; }
-.np-emoji { font-size: 48px; margin-bottom: 4px; line-height: 1; }
-.np-name { font-size: 18px; font-weight: 800; color: #34d399; }
-.np-fact { font-size: 12px; color: #8b949e; margin-top: 4px; line-height: 1.5; }
-.np-empty { color: #6d7680; font-size: 13px; }
-.dino-grid { width: 100%; max-width: 480px; display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
-.dino-btn { aspect-ratio: 4 / 3; background: #161b22; border: 2px solid #30363d; border-radius: 14px; cursor: pointer; font-family: inherit; color: #fff; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; transition: transform 0.1s, border-color 0.15s; position: relative; overflow: hidden; }
-.dino-btn:active { transform: scale(0.96); border-color: #34d399; }
-.dino-btn .em { font-size: 56px; line-height: 1; }
-.dino-btn .name { font-size: 13px; font-weight: 700; }
-.dino-btn.playing { border-color: #34d399; box-shadow: 0 0 20px rgba(52,211,153,0.4); animation: pulse 0.6s infinite alternate; }
-@keyframes pulse { from { box-shadow: 0 0 20px rgba(52,211,153,0.4); } to { box-shadow: 0 0 30px rgba(52,211,153,0.7); } }
-.actions { display: flex; gap: 8px; margin-top: 14px; width: 100%; max-width: 480px; }
-.btn { flex: 1; padding: 12px; border: none; border-radius: 10px; font-size: 13px; font-weight: 700; font-family: inherit; cursor: pointer; color: #fff; }
-.btn-shuffle { background: linear-gradient(135deg, #34d399, #10b981); }
+
+.filters { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 12px; }
+.filt-group { display: flex; gap: 4px; flex-wrap: wrap; }
+.filt { padding: 6px 12px; background: #161b22; border: 1px solid #30363d; border-radius: 16px; color: #8b949e; font-size: 12px; cursor: pointer; white-space: nowrap; }
+.filt.active { background: rgba(52,211,153,0.2); border-color: #34d399; color: #34d399; }
+.filt[data-d="carnivore"].active { background: rgba(248,113,113,0.2); border-color: #f87171; color: #f87171; }
+.filt[data-d="herbivore"].active { background: rgba(132,204,22,0.2); border-color: #84cc16; color: #84cc16; }
+.filt[data-d="piscivore"].active { background: rgba(96,165,250,0.2); border-color: #60a5fa; color: #60a5fa; }
+
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 10px; }
+.card { background: #161b22; border: 1px solid #30363d; border-radius: 12px; padding: 14px 10px; cursor: pointer; transition: transform 0.15s, border-color 0.15s, box-shadow 0.15s; text-align: center; position: relative; overflow: hidden; }
+.card:hover { transform: translateY(-3px); border-color: #34d399; box-shadow: 0 6px 20px rgba(52,211,153,0.2); }
+.card .em { font-size: 56px; line-height: 1; }
+.card .name { font-size: 14px; font-weight: 800; color: #fff; margin-top: 6px; }
+.card .name-en { font-size: 10px; color: #8b949e; margin-top: 2px; font-style: italic; font-family: system-ui, sans-serif; }
+.card .stats { font-size: 10px; color: #6d7680; margin-top: 6px; font-family: system-ui, sans-serif; }
+.card .stats strong { color: #34d399; font-weight: 700; }
+
+.era-badge { position: absolute; top: 6px; left: 6px; padding: 2px 6px; border-radius: 8px; font-size: 9px; font-weight: 700; font-family: system-ui, sans-serif; letter-spacing: 0.5px; }
+.era-triassic { background: rgba(245,158,11,0.2); color: #fbbf24; border: 1px solid rgba(245,158,11,0.4); }
+.era-jurassic { background: rgba(132,204,22,0.2); color: #84cc16; border: 1px solid rgba(132,204,22,0.4); }
+.era-cretaceous { background: rgba(96,165,250,0.2); color: #60a5fa; border: 1px solid rgba(96,165,250,0.4); }
+
+.diet-badge { position: absolute; top: 6px; right: 6px; font-size: 14px; }
+
+.empty-msg { grid-column: 1 / -1; padding: 40px; text-align: center; color: #6d7680; }
+
+/* Modal */
+.modal { position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 100; display: none; align-items: flex-end; justify-content: center; backdrop-filter: blur(8px); }
+.modal.show { display: flex; animation: fadein 0.2s; }
+@keyframes fadein { from { opacity: 0; } to { opacity: 1; } }
+.modal-inner { background: linear-gradient(160deg, #161b22, #0d1117); border: 1px solid #30363d; border-radius: 20px 20px 0 0; width: 100%; max-width: 560px; max-height: 92vh; overflow-y: auto; padding: 18px 18px 32px; animation: slideup 0.3s cubic-bezier(.2,.7,.3,1); }
+@keyframes slideup { from { transform: translateY(100%); } to { transform: translateY(0); } }
+.modal-close { position: sticky; top: 0; margin-left: auto; margin-bottom: -32px; width: 36px; height: 36px; background: rgba(0,0,0,0.5); border: 1px solid #30363d; color: #fff; border-radius: 50%; cursor: pointer; font-size: 18px; display: flex; align-items: center; justify-content: center; z-index: 10; }
+
+.detail-head { text-align: center; padding: 20px 12px 10px; }
+.detail-em { font-size: 100px; line-height: 1; }
+.detail-name { font-size: 24px; font-weight: 800; color: #fff; margin-top: 8px; }
+.detail-en { font-size: 14px; color: rgba(255,255,255,0.7); margin-top: 2px; font-style: italic; font-family: system-ui, sans-serif; }
+.detail-pron { font-size: 11px; color: #6d7680; margin-top: 4px; font-family: system-ui, sans-serif; }
+
+.detail-badges { display: flex; gap: 6px; justify-content: center; margin: 14px 0; flex-wrap: wrap; }
+.detail-badge { padding: 4px 12px; border-radius: 14px; font-size: 12px; font-weight: 700; font-family: system-ui, sans-serif; }
+
+.stat-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin: 14px 0; }
+.stat-cell { background: rgba(0,0,0,0.3); padding: 10px 8px; border-radius: 10px; text-align: center; }
+.stat-label { font-size: 10px; color: #8b949e; letter-spacing: 1px; text-transform: uppercase; font-family: system-ui, sans-serif; }
+.stat-val { font-size: 18px; font-weight: 800; color: #fff; margin-top: 4px; font-variant-numeric: tabular-nums; font-family: system-ui, sans-serif; }
+.stat-unit { font-size: 11px; color: #8b949e; margin-left: 2px; }
+
+.size-compare { background: rgba(0,0,0,0.3); padding: 14px; border-radius: 10px; margin: 14px 0; }
+.size-compare-title { font-size: 11px; color: #8b949e; letter-spacing: 1.5px; text-transform: uppercase; margin-bottom: 10px; font-family: system-ui, sans-serif; }
+.size-row { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; }
+.size-row:last-child { margin-bottom: 0; }
+.size-row .who { width: 70px; font-size: 12px; color: #8b949e; flex-shrink: 0; }
+.size-row .bar-wrap { flex: 1; height: 16px; background: rgba(0,0,0,0.4); border-radius: 8px; overflow: hidden; position: relative; }
+.size-row .bar { height: 100%; background: linear-gradient(90deg, #34d399, #facc15); border-radius: 8px; transition: width 0.6s cubic-bezier(.34,1.56,.64,1); display: flex; align-items: center; justify-content: flex-end; padding-right: 6px; font-size: 10px; font-weight: 700; color: #0d1117; font-family: system-ui, sans-serif; }
+.size-row .bar.human { background: linear-gradient(90deg, #6366f1, #a855f7); color: #fff; }
+
+.fact-card { background: rgba(245,158,11,0.1); border: 1px solid rgba(245,158,11,0.3); padding: 12px 14px; border-radius: 10px; margin-top: 12px; }
+.fact-label { font-size: 11px; color: #fbbf24; letter-spacing: 2px; margin-bottom: 4px; font-weight: 800; font-family: system-ui, sans-serif; }
+.fact-text { font-size: 14px; line-height: 1.7; color: #fef3c7; }
+
+.share-row { display: flex; gap: 8px; margin-top: 14px; }
+.btn { flex: 1; padding: 10px; border: none; border-radius: 10px; font-size: 13px; font-weight: 700; font-family: inherit; cursor: pointer; color: #fff; }
 .btn-share { background: #1d9bf0; }
-.btn:active { transform: scale(0.97); }
+.btn-prev, .btn-next { background: #4b5563; }
+
 .footer { margin-top: 18px; color: #6d7680; font-size: 11px; text-align: center; }
 .footer a { color: #6d7680; text-decoration: none; }
 </style>
@@ -42,124 +97,223 @@ body { background: radial-gradient(ellipse at top, #0a2a1a 0%, #0d1117 70%); col
     <button class="lang-btn" data-lang="ja">JP</button>
     <button class="lang-btn" data-lang="en">EN</button>
 </div>
-<div class="topbar"><a href="https://pndshch.github.io/" data-i18n="back">← Pinda Lab</a><span data-i18n="title">きょうりゅうほえ</span></div>
+<div class="container">
 
-<div class="brand-title" data-i18n="title">きょうりゅうほえ</div>
-<div class="brand-sub" data-i18n="subtitle">タップして きょうりゅうの こえを ききくらべよう!</div>
+<div class="topbar"><a href="https://pndshch.github.io/" data-i18n="back">← Pinda Lab</a><span data-i18n="title">きょうりゅうずかん</span></div>
 
-<div class="now-playing" id="np"><div class="np-empty" data-i18n="emptyHint">ボタンを タップ してね</div></div>
+<div class="brand-title" data-i18n="title">きょうりゅうずかん</div>
+<div class="brand-sub" data-i18n="subtitle">12しゅるいの きょうりゅうを くらべて まなぼう</div>
 
-<div class="dino-grid" id="grid"></div>
-
-<div class="actions">
-    <button class="btn btn-shuffle" id="shuffle" data-i18n="random">🎲 ランダム</button>
-    <button class="btn btn-share" id="share" data-i18n="share">𝕏 にシェア</button>
+<div class="filters">
+    <div class="filt-group">
+        <span class="filt active" data-e="all" data-i18n="fAll">ぜんぶ</span>
+        <span class="filt" data-e="triassic" data-i18n="fTri">三畳紀</span>
+        <span class="filt" data-e="jurassic" data-i18n="fJur">ジュラ紀</span>
+        <span class="filt" data-e="cretaceous" data-i18n="fCre">白亜紀</span>
+    </div>
+    <div class="filt-group">
+        <span class="filt" data-d="carnivore" data-i18n="dCarn">🥩 肉食</span>
+        <span class="filt" data-d="herbivore" data-i18n="dHerb">🌿 草食</span>
+        <span class="filt" data-d="piscivore" data-i18n="dPisc">🐟 魚食</span>
+    </div>
 </div>
+
+<div class="grid" id="grid"></div>
 
 <div class="footer"><p><a href="https://pndshch.github.io/">© Pinda Lab</a> · <a href="https://www.buymeacoffee.com/pndshch" target="_blank">☕</a></p></div>
 
+</div>
+
+<div class="modal" id="modal">
+    <div class="modal-inner" id="modal-inner">
+        <button class="modal-close" id="close">✕</button>
+        <div id="detail"></div>
+    </div>
+</div>
+
 <script>
 'use strict';
-const I18N = {
-    ja: { title: 'きょうりゅうほえ', subtitle: 'タップして きょうりゅうの こえを ききくらべよう!', back: '← Pinda Lab',
-          emptyHint: 'ボタンを タップ してね', random: '🎲 ランダム', share: '𝕏 にシェア',
-          shareText: 'きょうりゅうほえ 🦖 8種類のきょうりゅうのほえごえを ききくらべ!',
-          dinoNames: { trex: 'ティラノサウルス', bron: 'ブラキオサウルス', velo: 'ヴェロキラプトル', tric: 'トリケラトプス', pter: 'プテラノドン', steg: 'ステゴサウルス', duck: 'パラサウロロフス', baby: 'あかちゃんダイノ' },
-          dinoFacts: { trex: '地球史上 さいきょう級の 肉食きょうりゅう!', bron: '長い首と 大きな体の そうしょくきょうりゅう。', velo: 'すばやくて かしこい 小がた肉食きょうりゅう。', tric: '3本の つのを もつ ちからもち。', pter: '大きな つばさで 空をとぶ。', steg: '背中の せばんが かっこいい。', duck: '頭の とさかから 音を出すよ!', baby: 'うまれたばかり!かわいい。' } },
-    en: { title: 'Dino Roar Box', subtitle: 'Tap to compare 8 different dinosaur roars!', back: '← Pinda Lab',
-          emptyHint: 'Tap a button', random: '🎲 Random', share: 'Share on 𝕏',
-          shareText: 'Dino Roar Box 🦖 Compare 8 different dinosaur roars!',
-          dinoNames: { trex: 'Tyrannosaurus', bron: 'Brachiosaurus', velo: 'Velociraptor', tric: 'Triceratops', pter: 'Pteranodon', steg: 'Stegosaurus', duck: 'Parasaurolophus', baby: 'Baby Dino' },
-          dinoFacts: { trex: 'One of the strongest carnivores ever!', bron: 'Long-necked giant herbivore.', velo: 'Fast and clever small carnivore.', tric: 'Strong with three horns.', pter: 'Soared the skies on huge wings.', steg: 'Famous spiky back plates.', duck: 'Made sounds through its head crest!', baby: 'Just hatched! So cute.' } },
-};
+const t = (j, e) => ({j, e});
 let curLang = 'ja';
+function L(field) { return field && typeof field === 'object' && 'j' in field ? field[curLang === 'en' ? 'e' : 'j'] : field; }
+
+const I18N_UI = {
+    ja: { title: 'きょうりゅうずかん', subtitle: '12しゅるいの きょうりゅうを くらべて まなぼう', back: '← Pinda Lab',
+          fAll: 'ぜんぶ', fTri: '三畳紀', fJur: 'ジュラ紀', fCre: '白亜紀',
+          dCarn: '🥩 肉食', dHerb: '🌿 草食', dPisc: '🐟 魚食',
+          eraTriassic: '三畳紀', eraJurassic: 'ジュラ紀', eraCretaceous: '白亜紀',
+          dietCarn: '🥩 肉食', dietHerb: '🌿 草食', dietPisc: '🐟 魚食',
+          mya: '万年前', length: 'ながさ', weight: 'おもさ', height: 'たかさ', meter: 'm', kg: 'kg', tonne: 't',
+          sizeCompareTitle: '▼ おおきさ くらべ', humanLabel: '🧒 にんげん',
+          factLabel: '✦ おもしろ豆知識',
+          notFound: 'いない',
+          shareText: (n) => `きょうりゅうずかん で 「${n}」を 学びました 🦖` },
+    en: { title: 'Dino Field Guide', subtitle: 'Compare and learn 12 dinosaurs', back: '← Pinda Lab',
+          fAll: 'All', fTri: 'Triassic', fJur: 'Jurassic', fCre: 'Cretaceous',
+          dCarn: '🥩 Meat', dHerb: '🌿 Plants', dPisc: '🐟 Fish',
+          eraTriassic: 'Triassic', eraJurassic: 'Jurassic', eraCretaceous: 'Cretaceous',
+          dietCarn: '🥩 Carnivore', dietHerb: '🌿 Herbivore', dietPisc: '🐟 Piscivore',
+          mya: 'mya', length: 'Length', weight: 'Weight', height: 'Height', meter: 'm', kg: 'kg', tonne: 't',
+          sizeCompareTitle: '▼ Size Comparison', humanLabel: '🧒 Human',
+          factLabel: '✦ Fun Fact',
+          notFound: 'No matches',
+          shareText: (n) => `Learned about "${n}" on Dino Field Guide 🦖` },
+};
+
+// Dinosaurs (length=m, weight=kg, height=m, period range millions years ago)
+const D = (id,em,n,en,pron,era,from,to,length,weight,height,diet,fact) => ({id,em,n,en,pron,era,from,to,length,weight,height,diet,fact});
+const DINOS = [
+    D('trex','🦖',t('ティラノサウルス','Tyrannosaurus'),'Tyrannosaurus rex','tie-RAN-uh-SORE-us','cretaceous',6800,6600,12,7000,4,'carnivore',
+      t('するどい歯は最長30cm。1日に200kgのお肉を食べたんだって!','Teeth up to 30cm long. Could eat 200kg of meat in one day!')),
+    D('brach','🦕',t('ブラキオサウルス','Brachiosaurus'),'Brachiosaurus altithorax','BRAK-ee-uh-SORE-us','jurassic',15400,15000,26,50000,13,'herbivore',
+      t('身長13m。4階建てビルくらい大きいよ!首がながくて木のてっぺんの葉を食べてた。','13m tall — like a 4-story building! Long neck for tree-top leaves.')),
+    D('tric','🦏',t('トリケラトプス','Triceratops'),'Triceratops horridus','try-SAIR-uh-tops','cretaceous',6800,6600,9,6000,3,'herbivore',
+      t('800本以上の歯が交代で生えてくる。3本のつのは敵をふせぐためのもの。','Over 800 teeth in cycling rows. The three horns kept enemies away.')),
+    D('velo','🐊',t('ヴェロキラプトル','Velociraptor'),'Velociraptor mongoliensis','veh-LOSS-ih-RAP-tor','cretaceous',7500,7100,2,15,0.5,'carnivore',
+      t('じつは七面鳥くらいの大きさ。羽毛があったらしいよ!かしこくてすばやい。','Actually turkey-sized! Likely had feathers. Smart and very fast.')),
+    D('steg','🐢',t('ステゴサウルス','Stegosaurus'),'Stegosaurus stenops','STEG-uh-SORE-us','jurassic',15500,14500,9,3000,4,'herbivore',
+      t('体は大きいのに脳はくるみくらい。背中の板で体温を調節していた説も。','Body huge but brain walnut-sized. Back plates may have regulated temperature.')),
+    D('pter','🦅',t('プテラノドン','Pteranodon'),'Pteranodon longiceps','teh-RAN-uh-don','cretaceous',8800,8000,2,25,1.8,'piscivore',
+      t('じつはきょうりゅうじゃなくて翼竜なんだ。つばさは7mで小型ヒコウキくらい!','Actually a pterosaur, not a dinosaur. 7m wingspan — like a small plane!')),
+    D('spin','🐉',t('スピノサウルス','Spinosaurus'),'Spinosaurus aegyptiacus','SPY-no-SORE-us','cretaceous',9900,9300,15,7400,5,'piscivore',
+      t('史上最大の肉食きょうりゅう。背中の帆と魚を食べる長い口がとくちょう。','Largest carnivorous dinosaur ever. Sail back and long fish-eating jaw.')),
+    D('anky','🐢',t('アンキロサウルス','Ankylosaurus'),'Ankylosaurus magniventris','ang-KYE-luh-SORE-us','cretaceous',6800,6600,8,6000,1.7,'herbivore',
+      t('しっぽのこんぼうでT-レックスの骨も折れた!体じゅう装甲だらけの戦車きょうりゅう。','Tail club could break a T-rex bone! Armored all over like a tank.')),
+    D('diplo','🦕',t('ディプロドクス','Diplodocus'),'Diplodocus carnegii','dih-PLOD-uh-kus','jurassic',15400,15200,27,15000,4.5,'herbivore',
+      t('全長27m!きょうりゅうの中でも特にながい。しっぽをムチみたいに使えた。','Up to 27m long! Among the longest. Used tail like a whip.')),
+    D('para','🦆',t('パラサウロロフス','Parasaurolophus'),'Parasaurolophus walkeri','PAR-uh-saw-ROL-uh-fus','cretaceous',7600,7300,9.5,2500,4.6,'herbivore',
+      t('頭のとさかはトランペット!仲間と音で会話していた。','Head crest worked like a trumpet — used to call to others.')),
+    D('allo','🐊',t('アロサウルス','Allosaurus'),'Allosaurus fragilis','AL-uh-SORE-us','jurassic',15500,15000,12,2300,3,'carnivore',
+      t('T-レックスより前の時代の最強ハンター。数頭で群れで狩りをしたかも。','Top hunter before T-rex. May have hunted in packs.')),
+    D('igua','🦖',t('イグアノドン','Iguanodon'),'Iguanodon bernissartensis','ig-WAN-uh-don','cretaceous',13000,12500,10,3500,2.7,'herbivore',
+      t('世界で2番目に発見されたきょうりゅう。手の親指が大きなツメだった!','Second dinosaur ever discovered. Had a huge thumb spike on each hand!')),
+];
+
+const grid = document.getElementById('grid');
+const modal = document.getElementById('modal');
+const detailEl = document.getElementById('detail');
+let curEra = 'all', curDiet = null;
+
 function applyLang(lang) {
     curLang = lang;
-    const dict = I18N[lang] || I18N.ja;
+    const dict = I18N_UI[lang] || I18N_UI.ja;
     document.documentElement.lang = lang;
     document.querySelectorAll('[data-i18n]').forEach(el => { const key = el.dataset.i18n; if (typeof dict[key] === 'string') el.textContent = dict[key]; });
     document.querySelectorAll('.lang-btn').forEach(btn => btn.classList.toggle('active', btn.dataset.lang === lang));
     try { localStorage.setItem('pl-lang', lang); } catch {}
     document.title = dict.title + ' | Pinda Lab';
-    // re-render dino names
-    DINOS.forEach(d => {
-        const btn = grid.querySelector(`[data-id="${d.id}"]`);
-        if (btn) btn.querySelector('.name').textContent = dict.dinoNames[d.id];
-    });
+    render();
 }
 document.querySelectorAll('.lang-btn').forEach(btn => btn.addEventListener('click', () => applyLang(btn.dataset.lang)));
 
-const DINOS = [
-    { id:'trex', em:'🦖', f0:80, f1:140, dur:1.6, type:'sawtooth', vibrato:8, mod:1.0 },
-    { id:'bron', em:'🦕', f0:60, f1:100, dur:2.0, type:'triangle', vibrato:3, mod:0.7 },
-    { id:'velo', em:'🐊', f0:300, f1:500, dur:0.8, type:'square', vibrato:14, mod:1.4 },
-    { id:'tric', em:'🦏', f0:120, f1:180, dur:1.4, type:'sawtooth', vibrato:5, mod:0.9 },
-    { id:'pter', em:'🦅', f0:600, f1:1100, dur:0.9, type:'sine', vibrato:12, mod:1.6 },
-    { id:'steg', em:'🐢', f0:90, f1:140, dur:1.5, type:'triangle', vibrato:4, mod:0.8 },
-    { id:'duck', em:'🦆', f0:220, f1:340, dur:1.7, type:'sine', vibrato:7, mod:1.0 },
-    { id:'baby', em:'🐣', f0:500, f1:900, dur:0.6, type:'sine', vibrato:18, mod:1.8 },
-];
-
-const grid = document.getElementById('grid');
-DINOS.forEach(d => {
-    const b = document.createElement('button');
-    b.className = 'dino-btn'; b.dataset.id = d.id;
-    b.innerHTML = `<span class="em">${d.em}</span><span class="name">${I18N.ja.dinoNames[d.id]}</span>`;
-    b.addEventListener('click', () => roar(d, b));
-    grid.appendChild(b);
-});
-
-let actx = null, activeBtn = null, activeNodes = [];
-function getCtx() { if (!actx) actx = new (window.AudioContext || window.webkitAudioContext)(); if (actx.state === 'suspended') actx.resume(); return actx; }
-function stopAll() { activeNodes.forEach(n => { try { n.stop(); n.disconnect(); } catch {} }); activeNodes = []; if (activeBtn) activeBtn.classList.remove('playing'); activeBtn = null; }
-
-function roar(d, btn) {
-    stopAll();
-    const ctx = getCtx();
-    const t0 = ctx.currentTime, dur = d.dur;
-    const osc = ctx.createOscillator();
-    osc.type = d.type;
-    osc.frequency.setValueAtTime(d.f0, t0);
-    osc.frequency.exponentialRampToValueAtTime(d.f1, t0 + dur * 0.3);
-    osc.frequency.exponentialRampToValueAtTime(d.f0 * 0.7, t0 + dur);
-    const lfo = ctx.createOscillator(); lfo.frequency.value = d.vibrato;
-    const lfoGain = ctx.createGain(); lfoGain.gain.value = d.f0 * 0.15;
-    lfo.connect(lfoGain).connect(osc.frequency);
-    const sub = ctx.createOscillator(); sub.type = 'sawtooth';
-    sub.frequency.setValueAtTime(d.f0 * 0.5, t0);
-    sub.frequency.exponentialRampToValueAtTime(d.f1 * 0.5, t0 + dur * 0.3);
-    sub.frequency.exponentialRampToValueAtTime(d.f0 * 0.35, t0 + dur);
-    const subGain = ctx.createGain(); subGain.gain.value = 0.25 * d.mod;
-    const gain = ctx.createGain();
-    gain.gain.setValueAtTime(0, t0);
-    gain.gain.linearRampToValueAtTime(0.4, t0 + 0.05);
-    gain.gain.linearRampToValueAtTime(0.4, t0 + dur * 0.7);
-    gain.gain.exponentialRampToValueAtTime(0.0001, t0 + dur);
-    const filter = ctx.createBiquadFilter(); filter.type = 'lowpass'; filter.frequency.value = 2000 * d.mod; filter.Q.value = 4;
-    const dist = ctx.createWaveShaper();
-    const curve = new Float32Array(256);
-    for (let i = 0; i < 256; i++) { const x = (i / 128) - 1; curve[i] = Math.tanh(x * 3); }
-    dist.curve = curve;
-    osc.connect(dist); sub.connect(subGain).connect(dist);
-    dist.connect(filter).connect(gain).connect(ctx.destination);
-    osc.start(t0); osc.stop(t0 + dur);
-    sub.start(t0); sub.stop(t0 + dur);
-    lfo.start(t0); lfo.stop(t0 + dur);
-    activeNodes.push(osc, sub, lfo);
-    btn.classList.add('playing'); activeBtn = btn;
-    setTimeout(() => { if (activeBtn === btn) { btn.classList.remove('playing'); activeBtn = null; } }, dur * 1000);
-    const dict = I18N[curLang] || I18N.ja;
-    document.getElementById('np').innerHTML = `<div class="np-emoji">${d.em}</div><div class="np-name">${dict.dinoNames[d.id]}</div><div class="np-fact">${dict.dinoFacts[d.id]}</div>`;
+function render() {
+    const dict = I18N_UI[curLang] || I18N_UI.ja;
+    grid.innerHTML = '';
+    let list = DINOS;
+    if (curEra !== 'all') list = list.filter(d => d.era === curEra);
+    if (curDiet) list = list.filter(d => d.diet === curDiet);
+    if (list.length === 0) { grid.innerHTML = `<div class="empty-msg">${dict.notFound}</div>`; return; }
+    list.forEach(d => {
+        const card = document.createElement('div');
+        card.className = 'card';
+        const eraText = ({ triassic: dict.eraTriassic, jurassic: dict.eraJurassic, cretaceous: dict.eraCretaceous })[d.era];
+        const dietEm = ({ carnivore: '🥩', herbivore: '🌿', piscivore: '🐟' })[d.diet];
+        card.innerHTML = `
+            <span class="era-badge era-${d.era}">${eraText}</span>
+            <span class="diet-badge">${dietEm}</span>
+            <div class="em">${d.em}</div>
+            <div class="name">${L(d.n)}</div>
+            <div class="name-en">${d.en.split(' ')[0]}</div>
+            <div class="stats">${dict.length} <strong>${d.length}${dict.meter}</strong></div>`;
+        card.addEventListener('click', () => openModal(d));
+        grid.appendChild(card);
+    });
 }
 
-document.getElementById('shuffle').addEventListener('click', () => {
-    const d = DINOS[Math.floor(Math.random() * DINOS.length)];
-    roar(d, grid.querySelector(`[data-id="${d.id}"]`));
-});
-document.getElementById('share').addEventListener('click', () => {
-    const dict = I18N[curLang] || I18N.ja;
-    window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(dict.shareText)}&url=${encodeURIComponent('https://pndshch.github.io/dino-roar/')}`, '_blank', 'noopener');
-});
+document.querySelectorAll('.filt[data-e]').forEach(f => f.addEventListener('click', () => {
+    curEra = f.dataset.e;
+    document.querySelectorAll('.filt[data-e]').forEach(x => x.classList.toggle('active', x === f));
+    render();
+}));
+document.querySelectorAll('.filt[data-d]').forEach(f => f.addEventListener('click', () => {
+    if (curDiet === f.dataset.d) {
+        curDiet = null;
+        f.classList.remove('active');
+    } else {
+        curDiet = f.dataset.d;
+        document.querySelectorAll('.filt[data-d]').forEach(x => x.classList.toggle('active', x === f));
+    }
+    render();
+}));
+
+function fmtMass(kg, dict) { if (kg >= 1000) return (kg / 1000).toFixed(kg % 1000 ? 1 : 0) + dict.tonne; return kg + dict.kg; }
+
+function openModal(d) {
+    const dict = I18N_UI[curLang] || I18N_UI.ja;
+    const eraText = ({ triassic: dict.eraTriassic, jurassic: dict.eraJurassic, cretaceous: dict.eraCretaceous })[d.era];
+    const dietText = ({ carnivore: dict.dietCarn, herbivore: dict.dietHerb, piscivore: dict.dietPisc })[d.diet];
+    // Size comparison: dino length vs human (1.7m) vs largest in dataset (27m)
+    const maxLength = Math.max(...DINOS.map(x => x.length));
+    const dinoLengthPct = Math.min(100, (d.length / maxLength) * 100);
+    const humanLengthPct = (1.7 / maxLength) * 100;
+
+    const yearsLabel = curLang === 'en'
+        ? `${d.from / 10}–${d.to / 10} ${dict.mya}`
+        : `${d.from}–${d.to} ${dict.mya}`;
+
+    const idx = DINOS.findIndex(x => x.id === d.id);
+    const prev = DINOS[(idx - 1 + DINOS.length) % DINOS.length];
+    const next = DINOS[(idx + 1) % DINOS.length];
+
+    detailEl.innerHTML = `
+        <div class="detail-head">
+            <div class="detail-em">${d.em}</div>
+            <div class="detail-name">${L(d.n)}</div>
+            <div class="detail-en">${d.en}</div>
+            <div class="detail-pron">/ ${d.pron} /</div>
+        </div>
+        <div class="detail-badges">
+            <span class="detail-badge era-${d.era}">${eraText} · ${yearsLabel}</span>
+            <span class="detail-badge ${d.diet === 'carnivore' ? 'era-cretaceous' : d.diet === 'herbivore' ? 'era-jurassic' : 'era-triassic'}" style="background: ${d.diet === 'carnivore' ? 'rgba(248,113,113,0.2)' : d.diet === 'herbivore' ? 'rgba(132,204,22,0.2)' : 'rgba(96,165,250,0.2)'}; color: ${d.diet === 'carnivore' ? '#f87171' : d.diet === 'herbivore' ? '#84cc16' : '#60a5fa'}; border: 1px solid ${d.diet === 'carnivore' ? 'rgba(248,113,113,0.4)' : d.diet === 'herbivore' ? 'rgba(132,204,22,0.4)' : 'rgba(96,165,250,0.4)'};">${dietText}</span>
+        </div>
+        <div class="stat-grid">
+            <div class="stat-cell"><div class="stat-label">${dict.length}</div><div class="stat-val">${d.length}<span class="stat-unit">${dict.meter}</span></div></div>
+            <div class="stat-cell"><div class="stat-label">${dict.weight}</div><div class="stat-val">${fmtMass(d.weight, dict)}</div></div>
+            <div class="stat-cell"><div class="stat-label">${dict.height}</div><div class="stat-val">${d.height}<span class="stat-unit">${dict.meter}</span></div></div>
+        </div>
+        <div class="size-compare">
+            <div class="size-compare-title">${dict.sizeCompareTitle}</div>
+            <div class="size-row">
+                <div class="who">${L(d.n)}</div>
+                <div class="bar-wrap"><div class="bar" style="width: ${dinoLengthPct}%">${d.length}m</div></div>
+            </div>
+            <div class="size-row">
+                <div class="who">${dict.humanLabel}</div>
+                <div class="bar-wrap"><div class="bar human" style="width: ${humanLengthPct}%">1.7m</div></div>
+            </div>
+        </div>
+        <div class="fact-card">
+            <div class="fact-label">${dict.factLabel}</div>
+            <div class="fact-text">${L(d.fact)}</div>
+        </div>
+        <div class="share-row">
+            <button class="btn btn-prev" id="btn-prev">← ${L(prev.n)}</button>
+            <button class="btn btn-share" id="btn-share">𝕏</button>
+            <button class="btn btn-next" id="btn-next">${L(next.n)} →</button>
+        </div>`;
+
+    document.getElementById('btn-prev').addEventListener('click', () => { document.getElementById('modal-inner').scrollTop = 0; openModal(prev); });
+    document.getElementById('btn-next').addEventListener('click', () => { document.getElementById('modal-inner').scrollTop = 0; openModal(next); });
+    document.getElementById('btn-share').addEventListener('click', () => {
+        const url = 'https://pndshch.github.io/dino-roar/';
+        window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(dict.shareText(L(d.n)))}&url=${encodeURIComponent(url)}`, '_blank', 'noopener');
+    });
+
+    modal.classList.add('show');
+    document.getElementById('modal-inner').scrollTop = 0;
+}
+document.getElementById('close').addEventListener('click', () => modal.classList.remove('show'));
+modal.addEventListener('click', (e) => { if (e.target === modal) modal.classList.remove('show'); });
 
 let initLang;
 try { initLang = localStorage.getItem('pl-lang'); } catch {}
